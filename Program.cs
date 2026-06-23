@@ -18,10 +18,10 @@ public class Program
 {
     public static void Main()
     {
-        // Punto di ingresso della Console App.
         ApplicazioneNegozio applicazione = new ApplicazioneNegozio();
-        // applicazione.Avvia();
-        TestNegozioOnline.EseguiTuttiITest();
+        applicazione.Avvia();
+
+        // TestNegozioOnline.EseguiTuttiITest();
     }
 }
 
@@ -44,13 +44,36 @@ public class ApplicazioneNegozio
 
     public void Avvia()
     {
-        // TODO: implementare il ciclo principale della Console App.
-        // Suggerimento:
-        // 1. mostrare un messaggio di benvenuto;
-        // 2. chiedere se l'utente vuole entrare come "utente" o "amministratore";
-        // 3. chiamare GestisciMenuUtente oppure GestisciMenuAmministratore;
-        // 4. permettere l'uscita dal programma con una scelta dedicata.
-        throw new NotImplementedException("Completare il metodo Avvia.");
+        bool continuaProgramma = true;
+
+        Console.WriteLine("========================================");
+        Console.WriteLine(" BENVENUTO NEL NEGOZIO ONLINE C#");
+        Console.WriteLine("========================================");
+
+        while (continuaProgramma)
+        {
+            string ruoloScelto = ScegliRuolo();
+
+            switch (ruoloScelto)
+            {
+                case "utente":
+                    GestisciMenuUtente();
+                    break;
+
+                case "amministratore":
+                    GestisciMenuAmministratore();
+                    break;
+
+                case "esci":
+                    continuaProgramma = false;
+                    Console.WriteLine("Uscita dal programma. Arrivederci!");
+                    break;
+
+                default:
+                    Console.WriteLine("Scelta non valida. Riprova.");
+                    break;
+            }
+        }
     }
 
     private void CaricaDatiIniziali()
@@ -64,39 +87,415 @@ public class ApplicazioneNegozio
 
     private string ScegliRuolo()
     {
-        // TODO: leggere da console il ruolo scelto.
-        // Valori consigliati: "utente", "amministratore", "esci".
-        // Gestire input vuoti e maiuscole/minuscole con Trim() e ToLower().
-        throw new NotImplementedException("Completare il metodo ScegliRuolo.");
+        Console.WriteLine();
+        Console.WriteLine("=== SCELTA RUOLO ===");
+        Console.WriteLine("1 - Utente");
+        Console.WriteLine("2 - Amministratore");
+        Console.WriteLine("0 - Esci");
+        Console.Write("Scegli un'opzione: ");
+
+        string? scelta = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(scelta))
+        {
+            return "";
+        }
+
+        scelta = scelta.Trim().ToLower();
+
+        switch (scelta)
+        {
+            case "1":
+            case "utente":
+                return "utente";
+
+            case "2":
+            case "amministratore":
+            case "admin":
+                return "amministratore";
+
+            case "0":
+            case "esci":
+                return "esci";
+
+            default:
+                return "";
+        }
     }
 
     private void GestisciMenuUtente()
     {
-        // TODO: implementare il menu utente.
-        // Operazioni richieste dalla traccia:
-        // - visualizzare catalogo;
-        // - aggiungere prodotto al carrello;
-        // - visualizzare carrello;
-        // - modificare quantità nel carrello;
-        // - rimuovere prodotto dal carrello;
-        // - svuotare carrello;
-        // - confermare acquisto;
-        // - visualizzare storico acquisti dell'utente.
-        throw new NotImplementedException("Completare il metodo GestisciMenuUtente.");
-    }
+        Console.Write("Inserisci il tuo nome utente: ");
+        string? nomeUtente = Console.ReadLine();
 
+        if (string.IsNullOrWhiteSpace(nomeUtente))
+        {
+            Console.WriteLine("Nome utente non valido. Ritorno al menu principale.");
+            return;
+        }
+
+        Utente utente = new Utente(nomeUtente);
+        bool continuaMenuUtente = true;
+
+        while (continuaMenuUtente)
+        {
+            Console.WriteLine();
+            Console.WriteLine("=== MENU UTENTE ===");
+            Console.WriteLine("1 - Visualizza catalogo");
+            Console.WriteLine("2 - Aggiungi prodotto al carrello");
+            Console.WriteLine("3 - Visualizza carrello");
+            Console.WriteLine("4 - Modifica quantità nel carrello");
+            Console.WriteLine("5 - Rimuovi prodotto dal carrello");
+            Console.WriteLine("6 - Svuota carrello");
+            Console.WriteLine("7 - Conferma acquisto");
+            Console.WriteLine("8 - Visualizza storico acquisti");
+            Console.WriteLine("0 - Torna al menu principale");
+            Console.Write("Scegli un'opzione: ");
+
+            string? scelta = Console.ReadLine();
+
+            switch (scelta)
+            {
+                case "1":
+                    MostraCatalogo();
+                    break;
+
+                case "2":
+                    MostraCatalogo();
+
+                    Console.Write("Inserisci codice prodotto da aggiungere: ");
+                    string? codiceDaAggiungere = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(codiceDaAggiungere))
+                    {
+                        Console.WriteLine("Codice prodotto non valido.");
+                        break;
+                    }
+
+                    int quantitaDaAggiungere = LeggiInteroPositivo("Inserisci quantità da aggiungere: ");
+
+                    bool aggiunto = servizioNegozio.AggiungiProdottoAlCarrello(
+                        codiceDaAggiungere.Trim(),
+                        quantitaDaAggiungere);
+
+                    if (aggiunto)
+                    {
+                        Console.WriteLine("Prodotto aggiunto al carrello.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Impossibile aggiungere il prodotto. Controlla codice o disponibilità.");
+                    }
+
+                    break;
+
+                case "3":
+                    MostraCarrello();
+                    break;
+
+                case "4":
+                    MostraCarrello();
+
+                    Console.Write("Inserisci codice prodotto da modificare: ");
+                    string? codiceDaModificare = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(codiceDaModificare))
+                    {
+                        Console.WriteLine("Codice prodotto non valido.");
+                        break;
+                    }
+
+                    int nuovaQuantita = LeggiInteroPositivo("Inserisci nuova quantità: ");
+
+                    bool modificato = carrelloUtente.ModificaQuantitaNelCarrello(
+                        codiceDaModificare.Trim(),
+                        nuovaQuantita);
+
+                    if (modificato)
+                    {
+                        Console.WriteLine("Quantità aggiornata nel carrello.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Impossibile modificare la quantità. Controlla codice o disponibilità.");
+                    }
+
+                    break;
+
+                case "5":
+                    MostraCarrello();
+
+                    Console.Write("Inserisci codice prodotto da rimuovere: ");
+                    string? codiceDaRimuovere = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(codiceDaRimuovere))
+                    {
+                        Console.WriteLine("Codice prodotto non valido.");
+                        break;
+                    }
+
+                    bool rimosso = carrelloUtente.RimuoviDalCarrello(codiceDaRimuovere.Trim());
+
+                    if (rimosso)
+                    {
+                        Console.WriteLine("Prodotto rimosso dal carrello.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Prodotto non trovato nel carrello.");
+                    }
+
+                    break;
+
+                case "6":
+                    carrelloUtente.SvuotaCarrello();
+                    Console.WriteLine("Carrello svuotato.");
+                    break;
+
+                case "7":
+                    try
+                    {
+                        Acquisto acquisto = servizioNegozio.ConfermaAcquisto(utente);
+                        Console.WriteLine("Acquisto confermato con successo.");
+                        servizioNegozio.StampaAcquisto(acquisto);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Errore durante la conferma dell'acquisto: " + ex.Message);
+                    }
+
+                    break;
+
+                case "8":
+                    List<Acquisto> acquistiUtente = storicoAcquisti.OttieniAcquistiPerUtente(utente.Nome);
+
+                    Console.WriteLine();
+                    Console.WriteLine("=== STORICO ACQUISTI DI " + utente.Nome + " ===");
+
+                    if (acquistiUtente.Count == 0)
+                    {
+                        Console.WriteLine("Nessun acquisto trovato.");
+                    }
+                    else
+                    {
+                        foreach (Acquisto acquisto in acquistiUtente)
+                        {
+                            servizioNegozio.StampaAcquisto(acquisto);
+                        }
+                    }
+
+                    break;
+
+                case "0":
+                    continuaMenuUtente = false;
+                    break;
+
+                default:
+                    Console.WriteLine("Scelta non valida. Riprova.");
+                    break;
+            }
+        }
+    }
     private void GestisciMenuAmministratore()
     {
-        // TODO: implementare il menu amministratore.
-        // Operazioni richieste dalla traccia:
-        // - visualizzare catalogo completo;
-        // - aggiungere prodotto;
-        // - eliminare prodotto;
-        // - modificare prezzo;
-        // - aumentare o diminuire quantità disponibile;
-        // - visualizzare tutti gli acquisti;
-        // - visualizzare quantità iniziale, venduta e disponibile per prodotto.
-        throw new NotImplementedException("Completare il metodo GestisciMenuAmministratore.");
+        bool continuaMenuAmministratore = true;
+
+        while (continuaMenuAmministratore)
+        {
+            Console.WriteLine();
+            Console.WriteLine("=== MENU AMMINISTRATORE ===");
+            Console.WriteLine("1 - Visualizza catalogo completo");
+            Console.WriteLine("2 - Aggiungi prodotto");
+            Console.WriteLine("3 - Elimina prodotto");
+            Console.WriteLine("4 - Modifica prezzo prodotto");
+            Console.WriteLine("5 - Modifica quantità disponibile");
+            Console.WriteLine("6 - Visualizza tutti gli acquisti");
+            Console.WriteLine("7 - Visualizza report prodotti");
+            Console.WriteLine("0 - Torna al menu principale");
+            Console.Write("Scegli un'opzione: ");
+
+            string? scelta = Console.ReadLine();
+
+            switch (scelta)
+            {
+                case "1":
+                    MostraCatalogo();
+                    break;
+
+                case "2":
+                    Console.Write("Inserisci codice prodotto: ");
+                    string? codiceNuovoProdotto = Console.ReadLine();
+
+                    Console.Write("Inserisci nome prodotto: ");
+                    string? nomeNuovoProdotto = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(codiceNuovoProdotto) || string.IsNullOrWhiteSpace(nomeNuovoProdotto))
+                    {
+                        Console.WriteLine("Codice o nome prodotto non valido.");
+                        break;
+                    }
+
+                    decimal prezzoNuovoProdotto = LeggiPrezzoPositivo("Inserisci prezzo prodotto: ");
+                    int quantitaNuovoProdotto = LeggiInteroPositivo("Inserisci quantità disponibile: ");
+
+                    try
+                    {
+                        Prodotto nuovoProdotto = new Prodotto(
+                            codiceNuovoProdotto.Trim(),
+                            nomeNuovoProdotto.Trim(),
+                            prezzoNuovoProdotto,
+                            quantitaNuovoProdotto);
+
+                        catalogoProdotti.AggiungiProdotto(nuovoProdotto);
+                        Console.WriteLine("Prodotto aggiunto al catalogo.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Errore durante l'aggiunta del prodotto: " + ex.Message);
+                    }
+
+                    break;
+
+                case "3":
+                    MostraCatalogo();
+
+                    Console.Write("Inserisci codice prodotto da eliminare: ");
+                    string? codiceDaEliminare = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(codiceDaEliminare))
+                    {
+                        Console.WriteLine("Codice prodotto non valido.");
+                        break;
+                    }
+
+                    bool eliminato = catalogoProdotti.EliminaProdotto(codiceDaEliminare.Trim());
+
+                    if (eliminato)
+                    {
+                        Console.WriteLine("Prodotto eliminato dal catalogo.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Prodotto non trovato.");
+                    }
+
+                    break;
+
+                case "4":
+                    MostraCatalogo();
+
+                    Console.Write("Inserisci codice prodotto da modificare: ");
+                    string? codicePrezzo = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(codicePrezzo))
+                    {
+                        Console.WriteLine("Codice prodotto non valido.");
+                        break;
+                    }
+
+                    decimal nuovoPrezzo = LeggiPrezzoPositivo("Inserisci nuovo prezzo: ");
+
+                    try
+                    {
+                        bool prezzoModificato = catalogoProdotti.ModificaPrezzoProdotto(
+                            codicePrezzo.Trim(),
+                            nuovoPrezzo);
+
+                        if (prezzoModificato)
+                        {
+                            Console.WriteLine("Prezzo prodotto aggiornato.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Prodotto non trovato.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Errore durante la modifica del prezzo: " + ex.Message);
+                    }
+
+                    break;
+
+                case "5":
+                    MostraCatalogo();
+
+                    Console.Write("Inserisci codice prodotto da modificare: ");
+                    string? codiceQuantita = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(codiceQuantita))
+                    {
+                        Console.WriteLine("Codice prodotto non valido.");
+                        break;
+                    }
+
+                    Console.WriteLine("Inserisci una variazione di quantità.");
+                    Console.WriteLine("Esempio: 5 per aumentare, -3 per diminuire.");
+                    Console.Write("Variazione quantità: ");
+
+                    string? inputVariazione = Console.ReadLine();
+
+                    if (!int.TryParse(inputVariazione, out int variazioneQuantita))
+                    {
+                        Console.WriteLine("Variazione non valida.");
+                        break;
+                    }
+
+                    try
+                    {
+                        bool quantitaModificata = catalogoProdotti.ModificaQuantitaProdotto(
+                            codiceQuantita.Trim(),
+                            variazioneQuantita);
+
+                        if (quantitaModificata)
+                        {
+                            Console.WriteLine("Quantità prodotto aggiornata.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Prodotto non trovato.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Errore durante la modifica della quantità: " + ex.Message);
+                    }
+
+                    break;
+
+                case "6":
+                    List<Acquisto> tuttiGliAcquisti = storicoAcquisti.OttieniTuttiGliAcquisti();
+
+                    Console.WriteLine();
+                    Console.WriteLine("=== TUTTI GLI ACQUISTI ===");
+
+                    if (tuttiGliAcquisti.Count == 0)
+                    {
+                        Console.WriteLine("Nessun acquisto registrato.");
+                    }
+                    else
+                    {
+                        foreach (Acquisto acquisto in tuttiGliAcquisti)
+                        {
+                            servizioNegozio.StampaAcquisto(acquisto);
+                        }
+                    }
+
+                    break;
+
+                case "7":
+                    servizioNegozio.StampaReportProdotti();
+                    break;
+
+                case "0":
+                    continuaMenuAmministratore = false;
+                    break;
+
+                default:
+                    Console.WriteLine("Scelta non valida. Riprova.");
+                    break;
+            }
+        }
     }
 
     private void MostraCatalogo()
@@ -181,16 +580,40 @@ public class ApplicazioneNegozio
 
     private int LeggiInteroPositivo(string messaggio)
     {
-        // TODO: leggere un numero intero positivo da console.
-        // Continuare a chiedere il valore finché l'utente non inserisce un intero > 0.
-        throw new NotImplementedException("Completare il metodo LeggiInteroPositivo.");
+        int valore;
+
+        do
+        {
+            Console.Write(messaggio);
+            string? input = Console.ReadLine();
+
+            if (int.TryParse(input, out valore) && valore > 0)
+            {
+                return valore;
+            }
+
+            Console.WriteLine("Valore non valido. Inserisci un numero intero maggiore di zero.");
+
+        } while (true);
     }
 
     private decimal LeggiPrezzoPositivo(string messaggio)
     {
-        // TODO: leggere un prezzo positivo da console.
-        // Usare decimal.TryParse e rifiutare valori minori o uguali a zero.
-        throw new NotImplementedException("Completare il metodo LeggiPrezzoPositivo.");
+        decimal valore;
+
+        do
+        {
+            Console.Write(messaggio);
+            string? input = Console.ReadLine();
+
+            if (decimal.TryParse(input, out valore) && valore > 0)
+            {
+                return valore;
+            }
+
+            Console.WriteLine("Prezzo non valido. Inserisci un numero maggiore di zero.");
+
+        } while (true);
     }
 }
 
