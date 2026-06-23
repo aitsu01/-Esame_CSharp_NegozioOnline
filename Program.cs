@@ -403,16 +403,31 @@ public class ApplicazioneNegozio
 
                         if (prezzoModificato)
                         {
-                            Console.WriteLine("Prezzo prodotto aggiornato.");
+                            Prodotto? prodottoAggiornato = catalogoProdotti.CercaProdottoPerCodice(codicePrezzo.Trim());
+
+                            if (prodottoAggiornato != null)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Prodotto aggiornato correttamente:");
+                                Console.WriteLine("Codice: " + prodottoAggiornato.CodiceProdotto);
+                                Console.WriteLine("Nome: " + prodottoAggiornato.Nome);
+                                Console.WriteLine("Nuovo prezzo: " + prodottoAggiornato.Prezzo.ToString("C"));
+                                Console.WriteLine("Quantità disponibile: " + prodottoAggiornato.QuantitaDisponibile);
+                            }
                         }
                         else
                         {
                             Console.WriteLine("Prodotto non trovato.");
                         }
-                    }
+                    
+                   
+
+
+            }
+
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Errore durante la modifica del prezzo: " + ex.Message);
+                        Console.WriteLine("Errore durante la modifica della quantità: " + ex.Message);
                     }
 
                     break;
@@ -449,7 +464,17 @@ public class ApplicazioneNegozio
 
                         if (quantitaModificata)
                         {
-                            Console.WriteLine("Quantità prodotto aggiornata.");
+                            Prodotto? prodottoAggiornato = catalogoProdotti.CercaProdottoPerCodice(codiceQuantita.Trim());
+
+                            if (prodottoAggiornato != null)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Prodotto aggiornato correttamente:");
+                                Console.WriteLine("Codice: " + prodottoAggiornato.CodiceProdotto);
+                                Console.WriteLine("Nome: " + prodottoAggiornato.Nome);
+                                Console.WriteLine("Prezzo: " + prodottoAggiornato.Prezzo.ToString("C"));
+                                Console.WriteLine("Quantità disponibile aggiornata: " + prodottoAggiornato.QuantitaDisponibile);
+                            }
                         }
                         else
                         {
