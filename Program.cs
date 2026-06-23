@@ -305,10 +305,12 @@ public class ElementoCarrello
 
     public void CambiaQuantitaScelta(int nuovaQuantita)
     {
-        // TODO: validare che la nuova quantità sia maggiore di zero.
-        // Se è valida, aggiornare QuantitaScelta.
-        // Se non è valida, lanciare ArgumentException con un messaggio comprensibile.
-        throw new NotImplementedException("Completare il metodo CambiaQuantitaScelta.");
+        if (nuovaQuantita <= 0)
+        {
+            throw new ArgumentException("La quantità scelta deve essere maggiore di zero.");
+        }
+
+        QuantitaScelta = nuovaQuantita;
     }
 }
 
@@ -381,9 +383,15 @@ public class CatalogoProdotti : IGestioneCatalogo
 
     public bool EliminaProdotto(string codiceProdotto)
     {
-        // TODO: cercare il prodotto tramite codice e rimuoverlo dalla lista.
-        // Restituire true se il prodotto è stato eliminato, false se non esiste.
-        throw new NotImplementedException("Completare il metodo EliminaProdotto.");
+        Prodotto? prodottoDaEliminare = CercaProdottoPerCodice(codiceProdotto);
+
+        if (prodottoDaEliminare == null)
+        {
+            return false;
+        }
+
+        prodotti.Remove(prodottoDaEliminare);
+        return true;
     }
 
     public Prodotto? CercaProdottoPerCodice(string codiceProdotto)
@@ -401,16 +409,28 @@ public class CatalogoProdotti : IGestioneCatalogo
 
     public bool ModificaPrezzoProdotto(string codiceProdotto, decimal nuovoPrezzo)
     {
-        // TODO: trovare il prodotto e chiamare prodotto.CambiaPrezzo(nuovoPrezzo).
-        // Restituire false se il codice non esiste.
-        throw new NotImplementedException("Completare il metodo ModificaPrezzoProdotto.");
+        Prodotto? prodotto = CercaProdottoPerCodice(codiceProdotto);
+
+        if (prodotto == null)
+        {
+            return false;
+        }
+
+        prodotto.CambiaPrezzo(nuovoPrezzo);
+        return true;
     }
 
     public bool ModificaQuantitaProdotto(string codiceProdotto, int variazioneQuantita)
     {
-        // TODO: trovare il prodotto e chiamare prodotto.CambiaQuantita(variazioneQuantita).
-        // La variazione può essere positiva o negativa, ma il magazzino non deve scendere sotto zero.
-        throw new NotImplementedException("Completare il metodo ModificaQuantitaProdotto.");
+        Prodotto? prodotto = CercaProdottoPerCodice(codiceProdotto);
+
+        if (prodotto == null)
+        {
+            return false;
+        }
+
+        prodotto.CambiaQuantita(variazioneQuantita);
+        return true;
     }
 }
 
@@ -425,29 +445,57 @@ public class CarrelloUtente : IGestioneCarrello
 
     public bool AggiungiAlCarrello(Prodotto prodotto, int quantita)
     {
-        // TODO: completare l'aggiunta al carrello.
-        // Regole:
-        // - rifiutare quantità <= 0;
-        // - rifiutare quantità maggiore della disponibilità di magazzino;
-        // - se il prodotto è già presente, aumentare la quantità esistente;
-        // - controllare che quantità esistente + quantità richiesta non superi il magazzino.
-        throw new NotImplementedException("Completare il metodo AggiungiAlCarrello.");
+        if (quantita <= 0 || quantita > prodotto.QuantitaDisponibile)
+        {
+            return false;
+        }
+
+        ElementoCarrello? elementoEsistente = elementiCarrello.FirstOrDefault(elemento =>
+            elemento.ProdottoSelezionato.CodiceProdotto.Equals(prodotto.CodiceProdotto, StringComparison.OrdinalIgnoreCase));
+
+        if (elementoEsistente != null)
+        {
+            int nuovaQuantitaTotale = elementoEsistente.QuantitaScelta + quantita;
+
+            if (nuovaQuantitaTotale > prodotto.QuantitaDisponibile)
+            {
+                return false;
+            }
+
+            elementoEsistente.CambiaQuantitaScelta(nuovaQuantitaTotale);
+            return true;
+        }
+
+        elementiCarrello.Add(new ElementoCarrello(prodotto, quantita));
+        return true;
     }
 
     public bool ModificaQuantitaNelCarrello(string codiceProdotto, int nuovaQuantita)
     {
-        // TODO: trovare l'elemento del carrello e modificarne la quantità.
-        // Regole:
-        // - nuovaQuantita deve essere > 0;
-        // - nuovaQuantita non deve superare la disponibilità del prodotto.
-        throw new NotImplementedException("Completare il metodo ModificaQuantitaNelCarrello.");
+        ElementoCarrello? elemento = elementiCarrello.FirstOrDefault(elementoCarrello =>
+            elementoCarrello.ProdottoSelezionato.CodiceProdotto.Equals(codiceProdotto, StringComparison.OrdinalIgnoreCase));
+
+        if (elemento == null || nuovaQuantita <= 0 || nuovaQuantita > elemento.ProdottoSelezionato.QuantitaDisponibile)
+        {
+            return false;
+        }
+
+        elemento.CambiaQuantitaScelta(nuovaQuantita);
+        return true;
     }
 
     public bool RimuoviDalCarrello(string codiceProdotto)
     {
-        // TODO: rimuovere dal carrello l'elemento con il codice indicato.
-        // Restituire true se rimosso, false se non trovato.
-        throw new NotImplementedException("Completare il metodo RimuoviDalCarrello.");
+        ElementoCarrello? elemento = elementiCarrello.FirstOrDefault(elementoCarrello =>
+            elementoCarrello.ProdottoSelezionato.CodiceProdotto.Equals(codiceProdotto, StringComparison.OrdinalIgnoreCase));
+
+        if (elemento == null)
+        {
+            return false;
+        }
+
+        elementiCarrello.Remove(elemento);
+        return true;
     }
 
     public void SvuotaCarrello()
@@ -492,9 +540,9 @@ public class StoricoAcquisti : IGestioneAcquisti
 
     public List<Acquisto> OttieniAcquistiPerUtente(string nomeUtente)
     {
-        // TODO: filtrare gli acquisti per nome utente.
-        // Consiglio: usare StringComparison.OrdinalIgnoreCase per ignorare maiuscole/minuscole.
-        throw new NotImplementedException("Completare il metodo OttieniAcquistiPerUtente.");
+        return acquisti
+            .Where(acquisto => acquisto.NomeUtente.Equals(nomeUtente.Trim(), StringComparison.OrdinalIgnoreCase))
+            .ToList();
     }
 }
 
@@ -513,23 +561,51 @@ public class ServizioNegozio
 
     public bool AggiungiProdottoAlCarrello(string codiceProdotto, int quantita)
     {
-        // TODO: cercare il prodotto nel catalogo e delegare a carrelloUtente.AggiungiAlCarrello.
-        // Restituire false se il prodotto non esiste o se la quantità non è valida.
-        throw new NotImplementedException("Completare il metodo AggiungiProdottoAlCarrello.");
+        Prodotto? prodotto = catalogoProdotti.CercaProdottoPerCodice(codiceProdotto);
+
+        if (prodotto == null)
+        {
+            return false;
+        }
+
+        return carrelloUtente.AggiungiAlCarrello(prodotto, quantita);
     }
 
     public Acquisto ConfermaAcquisto(Utente utente)
     {
-        // TODO: completare la conferma dell'acquisto.
-        // Regole richieste dalla traccia:
-        // - impedire l'acquisto se il carrello è vuoto;
-        // - ricontrollare che ogni quantità sia valida e disponibile in magazzino;
-        // - creare gli ElementoAcquistato partendo dagli elementi del carrello;
-        // - diminuire la quantità disponibile dei prodotti acquistati;
-        // - registrare l'acquisto nello storico;
-        // - svuotare il carrello dopo un acquisto completato;
-        // - creare e restituire un Acquisto associato all'Utente ricevuto.
-        throw new NotImplementedException("Completare il metodo ConfermaAcquisto.");
+        List<ElementoCarrello> elementiCarrello = carrelloUtente.OttieniElementi();
+
+        if (elementiCarrello.Count == 0)
+        {
+            throw new InvalidOperationException("Impossibile confermare un acquisto con carrello vuoto.");
+        }
+
+        foreach (ElementoCarrello elemento in elementiCarrello)
+        {
+            if (elemento.QuantitaScelta <= 0 || elemento.QuantitaScelta > elemento.ProdottoSelezionato.QuantitaDisponibile)
+            {
+                throw new InvalidOperationException("Quantità non disponibile per il prodotto: " + elemento.ProdottoSelezionato.Nome);
+            }
+        }
+
+        List<ElementoAcquistato> prodottiAcquistati = elementiCarrello
+            .Select(elemento => new ElementoAcquistato(
+                elemento.ProdottoSelezionato.CodiceProdotto,
+                elemento.ProdottoSelezionato.Nome,
+                elemento.QuantitaScelta,
+                elemento.PrezzoUnitario))
+            .ToList();
+
+        foreach (ElementoCarrello elemento in elementiCarrello)
+        {
+            elemento.ProdottoSelezionato.CambiaQuantita(-elemento.QuantitaScelta);
+        }
+
+        Acquisto acquisto = new Acquisto(utente, prodottiAcquistati);
+        storicoAcquisti.RegistraAcquisto(acquisto);
+        carrelloUtente.SvuotaCarrello();
+
+        return acquisto;
     }
 
     public List<ReportProdotto> CreaReportProdotti()
