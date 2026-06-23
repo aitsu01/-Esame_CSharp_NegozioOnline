@@ -411,8 +411,9 @@ public class ApplicazioneNegozio
                                 Console.WriteLine("Prodotto aggiornato correttamente:");
                                 Console.WriteLine("Codice: " + prodottoAggiornato.CodiceProdotto);
                                 Console.WriteLine("Nome: " + prodottoAggiornato.Nome);
-                                Console.WriteLine("Nuovo prezzo: " + prodottoAggiornato.Prezzo.ToString("C"));
-                                Console.WriteLine("Quantità disponibile: " + prodottoAggiornato.QuantitaDisponibile);
+                                Console.WriteLine("Nuovo prezzo: " + prodottoAggiornato.Prezzo.ToString("0.00") + " euro");
+                                
+                                Console.WriteLine("Quantita disponibile: " + prodottoAggiornato.QuantitaDisponibile);
                             }
                         }
                         else
@@ -472,8 +473,10 @@ public class ApplicazioneNegozio
                                 Console.WriteLine("Prodotto aggiornato correttamente:");
                                 Console.WriteLine("Codice: " + prodottoAggiornato.CodiceProdotto);
                                 Console.WriteLine("Nome: " + prodottoAggiornato.Nome);
-                                Console.WriteLine("Prezzo: " + prodottoAggiornato.Prezzo.ToString("C"));
-                                Console.WriteLine("Quantità disponibile aggiornata: " + prodottoAggiornato.QuantitaDisponibile);
+                                Console.WriteLine("Prezzo: " + prodottoAggiornato.Prezzo.ToString("0.00") + " euro");
+
+
+                                Console.WriteLine("Quantita disponibile aggiornata: " + prodottoAggiornato.QuantitaDisponibile);
                             }
                         }
                         else
